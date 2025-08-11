@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>吳小熊的荷蘭任務卡</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ---------------- 頁面設定 ---------------- */
+        body {
+            font-family: 'Fredoka', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #ffffff;
+            text-align: center;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-title {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 20px;
+            z-index: 2;
+        }
+
+        /* ---------------- 扭蛋機 ---------------- */
+        .gachapon-machine {
+            width: 300px;
+            height: 450px;
+            background-color: #2c3e50;
+            border: 5px solid #2c3e50;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            z-index: 10;
+        }
+
+        .gachapon-top {
+            width: 250px;
+            height: 250px;
+            background-color: #e9f7ff;
+            border-radius: 10px;
+            border: 5px solid #64b5f6;
+            position: relative;
+            margin-top: 10px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        /* 扭蛋 */
+        .capsule-inside {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        /* 初始位置 */
+        .capsule-inside.c1 { background: #ffb6c1; bottom: 5px; left: 20px; }
+        .capsule-inside.c2 { background: #ffe082; bottom: 5px; left: 60px; }
+        .capsule-inside.c3 { background: #80cbc4; bottom: 5px; left: 100px; }
+        .capsule-inside.c4 { background: #9fa8da; bottom: 5px; left: 140px; }
+        .capsule-inside.c5 { background: #b39ddb; bottom: 5px; left: 180px; }
+        .capsule-inside.c6 { background: #ffccbc; bottom: 5px; left: 220px; }
+        .capsule-inside.c7 { background: #e57373; bottom: 45px; left: 40px; }
+        .capsule-inside.c8 { background: #64b5f6; bottom: 45px; left: 80px; }
+        .capsule-inside.c9 { background: #81c784; bottom: 45px; left: 120px; }
+        .capsule-inside.c10 { background: #ffb74d; bottom: 45px; left: 160px; }
+        .capsule-inside.c11 { background: #a1887f; bottom: 45px; left: 200px; }
+        .capsule-inside.c12 { background: #4db6ac; bottom: 85px; left: 60px; }
+        .capsule-inside.c13 { background: #ef9a9a; bottom: 85px; left: 100px; }
+        .capsule-inside.c14 { background: #fff59d; bottom: 85px; left: 140px; }
+        .capsule-inside.c15 { background: #9575cd; bottom: 85px; left: 180px; }
+
+        /* ---------------- 轉鈕 ---------------- */
+        .gachapon-handle {
+            width: 80px;
+            height: 80px;
+            background-color: #ffc107;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 60px;
+            left: 20px;
+            border: 5px solid #ff8f00;
+            cursor: pointer;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.2), 0 5px 10px rgba(0,0,0,0.3);
+        }
+        .gachapon-handle:disabled {
+            background-color: #a9a9a9;
+            border-color: #777;
+            cursor: not-allowed;
+        }
+
+        .handle-bar {
+            width: 15px;
+            height: 40px;
+            background-color: #a9a9a9;
+            position: absolute;
+            top: 20px;
+            left: 32.5px;
+            border-radius: 5px;
+            transform-origin: center center;
+        }
+
+        /* Handle 360°旋轉動畫 */
+        @keyframes spin360 {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .rotate-360 {
+            animation: spin360 1s ease-in-out;
+        }
+
+        /* ---------------- 出口與掉落扭蛋 ---------------- */
+        .gachapon-exit {
+            width: 80px;
+            height: 30px;
+            background-color: #424242;
+            border-radius: 0 0 10px 10px;
+            position: absolute;
+            bottom: 40px;
+            right: 20px;
+            border: 3px solid #6c7a89;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .capsule {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(to bottom, #d94f6c, #f48fb1);
+            border-radius: 50%;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+            position: absolute;
+            display: none;
+            animation: roll-out 2s forwards ease-out;
+        }
+        @keyframes roll-out {
+            0% { transform: translateY(-50px) translateX(-50px) rotate(0deg); opacity: 0; }
+            50% { opacity: 1; transform: translateY(0) translateX(0) rotate(180deg); }
+            100% { transform: translateY(30px) translateX(0) rotate(360deg); }
+        }
+
+        /* ---------------- 紙條 ---------------- */
+        .prize-paper-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            z-index: 20;
+        }
+        .prize-paper {
+            width: 250px;
+            height: 150px;
+            background-color: #fcf4c6;
+            border: 2px solid #ccc;
+            padding: 15px;
+            font-size: 1.5em;
+            text-align: center;
+            color: #d84315;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: scaleY(0);
+            transform-origin: top;
+            transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .prize-paper-unfold {
+            transform: scaleY(1);
+            opacity: 1;
+        }
+
+        /* ---------------- 扭蛋攪動動畫 ---------------- */
+        @keyframes wiggle {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(20px, -12px) rotate(12deg); }
+            50% { transform: translate(-8px, -40px) rotate(-20deg); }
+            75% { transform: translate(6px, -10px) rotate(10deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        .gachapon-top.rolling .capsule-inside {
+            animation-name: wiggle;
+            animation-timing-function: ease-in-out;
+            animation-iteration-count: infinite;
+        }
+
+        /* 每顆不同的隨機感（時間延長，慢一點） */
+        .capsule-inside:nth-child(1) { animation-delay: 0s; animation-duration: 2.0s; }
+        .capsule-inside:nth-child(2) { animation-delay: 0.1s; animation-duration: 2.1s; }
+        .capsule-inside:nth-child(3) { animation-delay: 0.15s; animation-duration: 2.2s; }
+        .capsule-inside:nth-child(4) { animation-delay: 0.2s; animation-duration: 2.3s; }
+        .capsule-inside:nth-child(5) { animation-delay: 0.05s; animation-duration: 2.1s; }
+        .capsule-inside:nth-child(6) { animation-delay: 0.3s; animation-duration: 2.2s; }
+        .capsule-inside:nth-child(7) { animation-delay: 0.25s; animation-duration: 2.0s; }
+        .capsule-inside:nth-child(8) { animation-delay: 0.35s; animation-duration: 2.3s; }
+        .capsule-inside:nth-child(9) { animation-delay: 0.2s; animation-duration: 2.2s; }
+        .capsule-inside:nth-child(10){ animation-delay: 0.4s; animation-duration: 2.3s; }
+        .capsule-inside:nth-child(11){ animation-delay: 0.15s; animation-duration: 2.1s; }
+        .capsule-inside:nth-child(12){ animation-delay: 0.25s; animation-duration: 2.2s; }
+        .capsule-inside:nth-child(13){ animation-delay: 0.05s; animation-duration: 2.0s; }
+        .capsule-inside:nth-child(14){ animation-delay: 0.3s; animation-duration: 2.3s; }
+        .capsule-inside:nth-child(15){ animation-delay: 0.35s; animation-duration: 2.1s; }
+
+
+        #message {
+            margin-top: 30px;
+            font-size: 1.5em;
+            color: #d84315;
+            min-height: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="page-title">吳小熊的荷蘭任務卡</h1>
+
+    <div class="gachapon-machine">
+        <div class="gachapon-top stopped">
+            <!-- 15 顆扭蛋 -->
+            <div class="capsule-inside c1"></div>
+            <div class="capsule-inside c2"></div>
+            <div class="capsule-inside c3"></div>
+            <div class="capsule-inside c4"></div>
+            <div class="capsule-inside c5"></div>
+            <div class="capsule-inside c6"></div>
+            <div class="capsule-inside c7"></div>
+            <div class="capsule-inside c8"></div>
+            <div class="capsule-inside c9"></div>
+            <div class="capsule-inside c10"></div>
+            <div class="capsule-inside c11"></div>
+            <div class="capsule-inside c12"></div>
+            <div class="capsule-inside c13"></div>
+            <div class="capsule-inside c14"></div>
+            <div class="capsule-inside c15"></div>
+        </div>
+        <div class="gachapon-handle" id="draw-button">
+            <div class="handle-bar"></div>
+        </div>
+        <div class="gachapon-exit">
+            <div class="capsule" id="capsule"></div>
+        </div>
+    </div>
+
+    <div id="prize-paper-wrapper" class="prize-paper-wrapper">
+        <div id="prize-paper" class="prize-paper"></div>
+    </div>
+
+    <div id="message"></div>
+
+    <script>
+        const initialPrizes = [
+            '🎉 頭獎：小熊造型鬱金香花束！',
+            '🎁 二獎：荷蘭風味小點心禮盒',
+            '🍬 三獎：可愛小熊餅乾',
+            '🍀 安慰獎：熊熊的荷式微笑',
+            '🍀 安慰獎：再接再厲！'
+        ];
+
+        const capsuleColors = [
+            'linear-gradient(to bottom, #d94f6c, #f48fb1)',
+            'linear-gradient(to bottom, #fdd835, #ffeb3b)',
+            'linear-gradient(to bottom, #81c784, #a5d6a7)',
+            'linear-gradient(to bottom, #7986cb, #9fa8da)',
+            'linear-gradient(to bottom, #ba68c8, #ce93d8)',
+            'linear-gradient(to bottom, #ff9800, #ffb74d)'
+        ];
+
+        let prizes = JSON.parse(localStorage.getItem('lotteryPrizes')) || initialPrizes;
+
+        const drawButton = document.getElementById('draw-button');
+        const handleBar = document.querySelector('.handle-bar');
+        const messageDisplay = document.getElementById('message');
+        const gachaponTop = document.querySelector('.gachapon-top');
+        const capsule = document.getElementById('capsule');
+        const prizePaperWrapper = document.getElementById('prize-paper-wrapper');
+        const prizePaper = document.getElementById('prize-paper');
+
+        function checkAndDisableButton() {
+            const lastDrawDate = localStorage.getItem('lastDrawDate');
+            const now = new Date();
+            const todayString = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate();
+
+            if (lastDrawDate === todayString) {
+                drawButton.disabled = true;
+                messageDisplay.textContent = '你今天已經抽過獎囉！';
+                gachaponTop.classList.add('stopped');
+                return true;
+            }
+
+            if (prizes.length === 0) {
+                drawButton.disabled = true;
+                messageDisplay.textContent = '所有獎品都已經被抽走了！';
+                gachaponTop.classList.add('stopped');
+                return true;
+            }
+            return false;
+        }
+
+        checkAndDisableButton();
+
+        drawButton.addEventListener('click', () => {
+            if (drawButton.disabled) return;
+
+            drawButton.disabled = true;
+            messageDisplay.textContent = '扭蛋滾動中...';
+            handleBar.classList.add('rotate-360');
+            setTimeout(() => handleBar.classList.remove('rotate-360'), 1000);
+
+            gachaponTop.classList.remove('stopped');
+            gachaponTop.classList.add('rolling');
+
+            capsule.style.display = 'none';
+            prizePaperWrapper.style.display = 'none';
+            prizePaper.classList.remove('prize-paper-unfold');
+
+            const randomIndex = Math.floor(Math.random() * prizes.length);
+            const prize = prizes[randomIndex];
+            const randomColorIndex = Math.floor(Math.random() * capsuleColors.length);
+            capsule.style.background = capsuleColors[randomColorIndex];
+
+            // 扭蛋機「逐漸加速 → 等速 → 停止」模擬
+            setTimeout(() => {
+                gachaponTop.classList.remove('rolling');
+                capsule.style.display = 'block';
+                messageDisplay.textContent = '扭蛋滾出來囉...';
+
+                setTimeout(() => {
+                    capsule.style.display = 'none';
+                    prizePaperWrapper.style.display = 'block';
+                    messageDisplay.textContent = '打開紙條...';
+                    gachaponTop.classList.add('stopped');
+
+                    setTimeout(() => {
+                        prizePaper.classList.add('prize-paper-unfold');
+                    }, 100);
+
+                    setTimeout(() => {
+                        prizePaper.textContent = prize;
+                        messageDisplay.textContent = '';
+                    }, 600);
+                }, 2000);
+            }, 3000);
+
+            prizes.splice(randomIndex, 1);
+            localStorage.setItem('lotteryPrizes', JSON.stringify(prizes));
+
+            const now = new Date();
+            const todayString = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate();
+            localStorage.setItem('lastDrawDate', todayString);
+        });
+    </script>
+</body>
+</html>
