@@ -17,7 +17,9 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #ffffff;
+            background: url('background.png') no-repeat center center;
+            background-size: contain; /* 保持圖片比例完整顯示 */
+            background-color: #cce7ff; /* 補背景色，避免空白 */
             text-align: center;
             flex-direction: column;
             position: relative;
@@ -25,12 +27,13 @@
         }
 
         .page-title {
-            font-size: 2.5em;
-            font-weight: 700;
-            color: #000000;
-            margin-bottom: 20px;
-            z-index: 2;
+            font-size: 2.5em;   /* 設定字體大小，2.5em 表示是基準字體大小的 2.5 倍 */
+            font-weight: 700;   /* 字體粗細，700 大約等於粗體 (bold) */
+            color: #000000;     /* 文字顏色，#000000 是黑色 */
+            margin-bottom: 20px;/* 標題底下留 20px 的空白 */
+            z-index: 2;         /* 疊放層級，數字越大會蓋在其他元素上面 */
         }
+
 
         /* ---------------- 扭蛋機 ---------------- */
         .gachapon-machine {
